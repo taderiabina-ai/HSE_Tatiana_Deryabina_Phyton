@@ -1,0 +1,93 @@
+ import random
+import time
+
+def main():
+    # ==========================================
+    # 1. Генерация отсортированного массива
+    # ==========================================
+    print("⏳ Генерация массива... (это может занять пару секунд)")
+    
+    # Случайный шаг от 3 до 5
+    step = random.randint(3, 5)
+    
+    # range автоматически создает отсортированную последовательность.
+    # Преобразуем в list, чтобы получить полноценный массив (список) в памяти.
+    arr = list(range(10, 250_000_000, step))
+    
+    print(f"✅ Массив создан!\n   Шаг: {step}\n   Количество элементов: {len(arr):,}")
+
+    # ==========================================
+    # 2. Генерация 10 случайных чисел
+    # ==========================================
+    # Используем list comprehension и random.randint
+    # Берем границы из созданного массива, чтобы часть чисел точно попала в него, 
+    # а часть (из-за шага) могла не попасть, что сделает тест интереснее.
+    min_val = arr[0]
+    max_val = arr[-1]
+    
+    random_targets = [random.randint(min_val, max_val) for _ in range(10)]
+    print(f"🎲 Сгенерировано {len(random_targets)} случайных чисел для поиска.\n")
+
+    # ==========================================
+    # 3. Функция линейного поиска
+    # ==========================================
+    def linear_search(data, target):
+        """Возвращает индекс элемента, если он найден, иначе -1"""
+        for index, value in enumerate(data):
+            if value == target:
+                return index
+        return -1
+
+    # ==========================================
+    # 4. Функция бинарного поиска
+    # ==========================================
+    def binary_search(data, target):
+        """Возвращает индекс элемента, если он найден, иначе -1. 
+        Требует, чтобы массив был отсортирован."""
+        left = 0
+        right = len(data) - 1
+        
+        while left <= right:
+            mid = (left + right) // 2
+            
+            if data[mid] == target:
+                return mid
+            elif data[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+                
+        return -1
+
+    # ==========================================
+    # 5. Проверка и замер времени
+    # ==========================================
+    print("=" * 70)
+    print("НАЧАЛО ТЕСТИРОВАНИЯ АЛГОРИТМОВ ПОИСКА")
+    print("=" * 70)
+
+    for target in random_targets:
+        print(f"\n🔍 Ищем число: {target}")
+        
+        # --- Линейный поиск ---
+        start_time = time.perf_counter() # Высокоточный таймер
+        lin_index = linear_search(arr, target)
+        lin_duration = time.perf_counter() - start_time
+        
+        lin_status = f"Найден (индекс: {lin_index:,})" if lin_index != -1 else "Не найден"
+        print(f"  ➖ Линейный поиск : {lin_status:<35} | Время: {lin_duration:.6f} сек.")
+        
+        # --- Бинарный поиск ---
+        start_time = time.perf_counter()
+        bin_index = binary_search(arr, target)
+        bin_duration = time.perf_counter() - start_time
+        
+        bin_status = f"Найден (индекс: {bin_index:,})" if bin_index != -1 else "Не найден"
+        print(f"  ➗ Бинарный поиск : {bin_status:<35} | Время: {bin_duration:.6f} сек.")
+        
+        # Контрольная проверка корректности работы алгоритмов
+        if lin_index != bin_index:
+            print("  ⚠️ ОШИБКА: Результаты алгоритмов не совпадают!")
+
+if __name__ == "__main__":
+    main()
